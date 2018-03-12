@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/sirocchj/sbt-api-builder.svg?branch=master)](https://travis-ci.org/sirocchj/sbt-api-builder)
 
-# ApiBuilderAutoPlugin
+# ApiBuilder SBT Plugin
 
 A plugin that liberates you from ever needing to use the CLI for updating
 ApiBuilder definitions.
