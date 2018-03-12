@@ -1,0 +1,13 @@
+sbt-api-builder
+Copyright 2018 Julien Sirocchi
+Licensed under MIT License (see LICENSE)
+
+circe is distributed with the application.
+Copyright (c) 2015, Ephox Pty Ltd, Mark Hibberd, Sean Parsons, Travis Brown, and
+other contributors. All rights reserved.
+Licensed under Apache License, Version 2.0 (see licenses/LICENSE_circe)
+
+circe-yaml is distributed with the application.
+Licensed under Apache License, Version 2.0 (see licenses/LICENSE_circe-yaml)
+circe-yaml is not distributed with a NOTICE file so the NOTICE requirement
+of its license is satisfied.

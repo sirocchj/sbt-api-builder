@@ -1,0 +1,4 @@
+> apiBuilderUpdate
+$ exists target/scala-2.12/src_managed/main/io/apibuilder/common/v0/ApicollectiveApibuilderCommonV0JsonOnly.scala
+$ exists target/scala-2.12/src_managed/main/io/apibuilder/common/v0/ApicollectiveApibuilderCommonV0ModelsOnly.scala
+$ exists target/scala-2.12/src_managed/main/io/apibuilder/internal/v0/ApicollectiveApibuilderInternalV0Models.scala

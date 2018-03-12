@@ -1,0 +1,7 @@
+.idea
+
+local.*
+
+target
+project/project
+project/target
