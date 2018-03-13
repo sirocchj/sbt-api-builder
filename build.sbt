@@ -11,19 +11,24 @@ lazy val `sbt-api-builder` = project
     ),
     licenses += "MIT" -> url("http://opensource.org/licenses/MIT"),
     homepage := Some(url("https://github.com/sirocchj/sbt-api-builder")),
-    developers += Developer("sirocchj",
-                            "Julien Sirocchi",
-                            "julien.sirocchi@gmail.com",
-                            url("https://github.com/sirocchj")),
+    developers += Developer(
+      "sirocchj",
+      "Julien Sirocchi",
+      "julien.sirocchi@gmail.com",
+      url("https://github.com/sirocchj")
+    ),
     scmInfo := Some(
       ScmInfo(
         url("https://github.com/sirocchj/sbt-api-builder"),
         "scm:git:git@github.com:sirocchj/sbt-api-builder.git"
-      )),
+      )
+    ),
+    bintrayPackageLabels := Seq("sbt", "plugin", "api-builder"),
     bintrayReleaseOnPublish := !isSnapshot.value,
     pgpPublicRing := file(".travis/local.pubring.asc"),
     pgpSecretRing := file(".travis/local.secring.asc"),
     releaseEarlyWith := BintrayPublisher,
+    releaseEarlyEnableSyncToMaven := false,
     scriptedBufferLog := false,
     scriptedLaunchOpts ++= Seq("-Xmx1024M", s"-Dplugin.version=${version.value}")
   )
