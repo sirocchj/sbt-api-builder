@@ -13,9 +13,6 @@ addons:
   apt:
     packages:
     - oracle-java8-installer
-deploy:
-  on:
-    tags: true
 before_cache:
 - find $HOME/.sbt -name "*.lock" | xargs rm
 - find $HOME/.ivy2 -name "ivydata-*.properties" | xargs rm

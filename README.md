@@ -11,7 +11,7 @@ This plugin requires sbt 1.0.0+
 
 Add the following line to your `./project/plugins.sbt` file:
 ```sbtshell
-addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.3")
+addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.4")
 ```
 
 That's it! This plugin is automatically installed into every module your project
