@@ -17,7 +17,9 @@ final class ApiBuilderClient(log: Logger, baseURL: URL, basicAuth: String) {
             val Valid = new CodeValidator(log, matchers)
             client
               .run {
-                Gigahorse.url(s"$baseURL/$path").addHeaders("Authentication" -> basicAuth)
+                val request = Gigahorse.url(s"$baseURL/$path").addHeaders("Authorization" -> basicAuth)
+                log.debug(s"sending $request")
+                request
               }
               .collect {
                 case Valid(lastModified, codeFiles) =>
