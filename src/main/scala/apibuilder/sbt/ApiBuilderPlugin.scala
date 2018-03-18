@@ -77,9 +77,8 @@ object ApiBuilderPlugin extends AutoPlugin {
 
       val eventualResponses = (clientOrError, requestsOrError) match {
         case (Right(c), Right(r)) => c.retrieveAll(r)
-        case (Left(e1), Left(e2)) => Future.failed(new RuntimeException(s"$e1 and $e2"))
         case (Left(e1), _)        => Future.failed(e1)
-        case (_, Left(e2))        => Future.failed(e2)
+        case (_, Left(e2))        => log.debug(e2.getLocalizedMessage); Future.successful(Seq.empty)
       }
 
       Await.result(eventualResponses, 1.minute).map {
