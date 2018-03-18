@@ -11,19 +11,19 @@ This plugin requires sbt 1.0.0+
 
 Add the following line to your `./project/plugins.sbt` file:
 ```sbtshell
-addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.4")
+addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.5")
 ```
 
 That's it! This plugin is automatically installed into every module your project
 is made of. To disable it for some module(s) you need to add the following line
 to your project module(s)' definition:
 ```sbtshell
-.disablePlugin(ApiBuilderPlugin)
+.disablePlugins(ApiBuilderPlugin)
 ```
 e.g.
 ```sbtshell
 lazy val example = project.in(file("."))
-  .disablePlugin(ApiBuilderPlugin)
+  .disablePlugins(ApiBuilderPlugin)
 ```
 
 ## Usage
