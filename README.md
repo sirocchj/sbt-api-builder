@@ -11,7 +11,7 @@ This plugin requires sbt 1.0.0+
 
 Add the following line to your `./project/plugins.sbt` file:
 ```sbtshell
-addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.5")
+addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.6")
 ```
 
 That's it! This plugin is automatically installed into every module your project
@@ -39,6 +39,10 @@ file local to project).
 
 All files are copied in `target/SCALA_BIN_VERSION/src_managed/main`, maintaining
 the directory structure and file naming suggested by ApiBuilder.
+
+The above task is also added to the `sourceGenerators` setting for sbt to know
+it need to compile `src_managed`, which implies that any task that triggers
+`compile` will also trigger `apiBuilderUpdate`.
 
 ### Global configuration
 

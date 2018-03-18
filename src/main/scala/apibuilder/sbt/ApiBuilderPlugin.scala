@@ -45,7 +45,8 @@ object ApiBuilderPlugin extends AutoPlugin {
   private def rawSettings: Seq[Setting[_]] = Seq(
     apiBuilderCLIConfigDirectory := baseDirectory.value / ".apibuilder",
     apiBuilderCLIConfigFilename := "config",
-    apiBuilderUpdate := generate.value
+    apiBuilderUpdate := generate.value,
+    sourceGenerators += apiBuilderUpdate
   )
 
   def generate = Def.taskDyn {
