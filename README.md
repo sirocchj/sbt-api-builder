@@ -11,7 +11,7 @@ This plugin requires sbt 1.0.0+
 
 Add the following line to your `./project/plugins.sbt` file:
 ```sbtshell
-addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.6")
+addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.7")
 ```
 
 That's it! This plugin is automatically installed into every module your project
@@ -34,15 +34,15 @@ From within an SBT shell you can now access the task:
 ```
 This task will use the `default` profile's token in `~/.apibuilder/config`
 to fetch from `https://api.apibuilder.io/` all the resources defined in
-`./.apibuilder/config` (note the leading `.` in place of the `~`, i.e. config
-file local to project).
-
-All files are copied in `target/SCALA_BIN_VERSION/src_managed/main`, maintaining
+`src/main/apibuilder/config` and `src/test/apibuilder/config`.  All files
+are copied in `target/SCALA_BIN_VERSION/src_managed/main` and
+`target/SCALA_BIN_VERSION/src_managed/test`, respectively, maintaining
 the directory structure and file naming suggested by ApiBuilder.
 
-The above task is also added to the `sourceGenerators` setting for sbt to know
-it need to compile `src_managed`, which implies that any task that triggers
-`compile` will also trigger `apiBuilderUpdate`.
+The above task is also added to the `sourceGenerators` setting. This allows
+sbt to know that it needs to compile the `src_managed` directory also, which
+in turn implies that any task that triggers `compile` will also trigger
+`apiBuilderUpdate`.
 
 ### Global configuration
 

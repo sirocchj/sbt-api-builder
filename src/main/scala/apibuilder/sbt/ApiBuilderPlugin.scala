@@ -22,7 +22,7 @@ object ApiBuilderPlugin extends AutoPlugin {
     val apiBuilderUrl     = settingKey[URL]("The Api Builder URL to use (default: https://api.apibuilder.io)")
 
     val apiBuilderCLIConfigDirectory =
-      settingKey[File]("The directory where to find the ApiBuilder CLI YAML config file (default ./.apibuilder)")
+      settingKey[File]("The directory where to find the ApiBuilder CLI YAML config file (default src/[main|test]/apibuilder)")
     val apiBuilderCLIConfigFilename =
       settingKey[String]("The name of the ApiBuilder CLI YAML config file (default: config)")
 
@@ -43,7 +43,7 @@ object ApiBuilderPlugin extends AutoPlugin {
     inConfig(Compile)(rawSettings) ++ inConfig(Test)(rawSettings)
 
   private def rawSettings: Seq[Setting[_]] = Seq(
-    apiBuilderCLIConfigDirectory := baseDirectory.value / ".apibuilder",
+    apiBuilderCLIConfigDirectory := sourceDirectory.value / "apibuilder",
     apiBuilderCLIConfigFilename := "config",
     apiBuilderUpdate := generate.value,
     sourceGenerators += apiBuilderUpdate

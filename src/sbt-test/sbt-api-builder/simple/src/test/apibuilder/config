@@ -1,0 +1,9 @@
+code:
+  apicollective:
+    apibuilder-common:
+      version: latest
+      generators:
+        - generator: http4s_0_18
+          target: unused
+          files:
+            - '*Mock*'
