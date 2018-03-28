@@ -23,6 +23,7 @@ lazy val `sbt-api-builder` = project
         "scm:git:git@github.com:sirocchj/sbt-api-builder.git"
       )
     ),
+    publishMavenStyle := false,
     bintrayPackageLabels := Seq("sbt", "plugin", "api-builder"),
     bintrayReleaseOnPublish := !isSnapshot.value,
     pgpPublicRing := file(".travis/local.pubring.asc"),
