@@ -68,8 +68,12 @@ Likewise, the name of the file defaults to `config` but it can be changed via:
 Within this file the `default` profile is the one that will be used, unless
 instructed otherwise via:
 ```sbtshell
-> set Global/apiBuilderProfile := "other"
+> set Global/apiBuilderProfile := Some("other")
 ```
+or with the `APIBUILDER_PROFILE` environment variable.
+
+Otherwise, the token can be specified with the `APIBUILDER_TOKEN` environment variable.
+
 Finally, the ApiBuilder files are expected to be found hitting the endpoint
 `https://api.apibuilder.io`. If that is not the case (e.g. you host an internal
 repository), just set the plugin to fetch from a different endpoint:
