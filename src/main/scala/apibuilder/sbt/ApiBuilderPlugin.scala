@@ -8,6 +8,7 @@ import sbt.{Def, _}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
+import scala.util.Properties
 
 object ApiBuilderPlugin extends AutoPlugin {
 
@@ -18,7 +19,7 @@ object ApiBuilderPlugin extends AutoPlugin {
       settingKey[File]("The directory where to find the global ApiBuilder config file (default: ~/.apibuilder)")
     val apiBuilderGlobalConfigFilename =
       settingKey[String]("The name of the global ApiBuilder config file (default: config)")
-    val apiBuilderProfile = settingKey[String]("The profile name to use (default: default)")
+    val apiBuilderProfile = settingKey[Option[String]]("The profile name to use (default when none specified: default)")
     val apiBuilderUrl     = settingKey[URL]("The Api Builder URL to use (default: https://api.apibuilder.io)")
 
     val apiBuilderCLIConfigDirectory =
@@ -35,7 +36,7 @@ object ApiBuilderPlugin extends AutoPlugin {
   override def globalSettings: Seq[Def.Setting[_]] = Seq(
     apiBuilderGlobalConfigDirectory := Path.userHome / ".apibuilder",
     apiBuilderGlobalConfigFilename := "config",
-    apiBuilderProfile := "default",
+    apiBuilderProfile := None,
     apiBuilderUrl := url("https://api.apibuilder.io")
   )
 
@@ -63,17 +64,24 @@ object ApiBuilderPlugin extends AutoPlugin {
       def basicAuth(token: String): String = s"Basic ${B64.encodeToString(s"$token:".getBytes(UTF_8))}"
 
       val globalConfigFile   = apiBuilderGlobalConfigDirectory.value / apiBuilderGlobalConfigFilename.value
-      val profile            = apiBuilderProfile.value
+      val profile            = apiBuilderProfile.value.getOrElse(Properties.envOrElse("APIBUILDER_PROFILE", "default" ))
       val url                = apiBuilderUrl.value
       val localCLIConfigFile = apiBuilderCLIConfigDirectory.value / apiBuilderCLIConfigFilename.value
       val basePath           = sourceManaged.value.toPath
 
-      val clientOrError = logFileContents(globalConfigFile)(GlobalConfig.load).flatMap { config =>
-        config.profiles.get(profile).map(_.token) match {
-          case None        => Left(new RuntimeException(s"missing token for profile '$profile'"))
-          case Some(token) => Right(new ApiBuilderClient(log, url, basicAuth(token)))
+      val token: Option[String] = Properties.envOrNone("APIBUILDER_TOKEN")
+        .orElse {
+          logFileContents(globalConfigFile)(GlobalConfig.load)
+            .toOption
+            .flatMap(_.profiles.get(profile))
+            .map(_.token)
         }
+
+      val clientOrError = token match {
+        case None        => Left(new RuntimeException(s"missing token"))
+        case Some(token) => Right(new ApiBuilderClient(log, url, basicAuth(token)))
       }
+
       val requestsOrError = logFileContents(localCLIConfigFile)(CLIConfig.load).map(ApiBuilderRequests.fromCLIConfig)
 
       val eventualResponses = (clientOrError, requestsOrError) match {
