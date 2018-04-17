@@ -4,7 +4,7 @@ code:
       version: latest
       generators:
         - generator: http4s_0_18
-          target: unused
+          target: src/main/scala/tmp
           files:
             - '*ModelsOnly*'
             - '*JsonOnly*'
@@ -12,6 +12,5 @@ code:
       version: latest
       generators:
         - generator: scala_models
-          target: still_unused
           files:
             - '*'

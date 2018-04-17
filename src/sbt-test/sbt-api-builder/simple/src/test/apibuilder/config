@@ -4,6 +4,5 @@ code:
       version: latest
       generators:
         - generator: http4s_0_18
-          target: unused
           files:
             - '*Mock*'
