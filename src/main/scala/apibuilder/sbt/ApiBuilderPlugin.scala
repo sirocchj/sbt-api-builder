@@ -19,7 +19,7 @@ object ApiBuilderPlugin extends AutoPlugin {
       settingKey[File]("The directory where to find the global ApiBuilder config file (default: ~/.apibuilder)")
     val apiBuilderGlobalConfigFilename =
       settingKey[String]("The name of the global ApiBuilder config file (default: config)")
-    val apiBuilderProfile = settingKey[Option[String]]("The profile name to use (default: default)")
+    val apiBuilderProfile = settingKey[Option[String]]("The profile name to use (default when none specified: default)")
     val apiBuilderUrl     = settingKey[URL]("The Api Builder URL to use (default: https://api.apibuilder.io)")
 
     val apiBuilderCLIConfigDirectory =
@@ -69,7 +69,7 @@ object ApiBuilderPlugin extends AutoPlugin {
       val localCLIConfigFile = apiBuilderCLIConfigDirectory.value / apiBuilderCLIConfigFilename.value
       val basePath           = sourceManaged.value.toPath
 
-      val token: Option[String] = Properties.envOrNone("APIBUILDER_PROFILE")
+      val token: Option[String] = Properties.envOrNone("APIBUILDER_TOKEN")
         .orElse {
           logFileContents(globalConfigFile)(GlobalConfig.load)
             .toOption
