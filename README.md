@@ -99,6 +99,20 @@ The `files` key is interpreted as a GLOB pattern that files for the
 (`org` / `project` / `version` / `generator`) tuple must match for them to be
 saved.
 
+For example, to build [API Builder's api](https://app.apibuilder.io/apicollective/apibuilder-api/latest),
+the following config file is required.
+```yaml
+code:
+  apicollective:
+    apibuilder-api:
+      version: latest
+      generators:
+        - generator: http4s_0_18
+          files:
+            - '*ModelsJson.scala'
+            - '*Server.scala'
+```
+
 As with the global configuration, the directory and the filename of where this
 local configuration YAML file is to be found can be changed via:
 ```sbtshell
