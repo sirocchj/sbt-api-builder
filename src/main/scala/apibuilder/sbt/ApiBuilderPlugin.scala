@@ -91,7 +91,7 @@ object ApiBuilderPlugin extends AutoPlugin {
       }
 
       Await.result(eventualResponses, 1.minute).map {
-        case ApiBuilderResponse(lastModified, filePath, contents) =>
+        case ApiBuilderResponse(lastModified, target, filePath, contents) =>
           val file = basePath.resolve(filePath).normalize.toFile
           if (!file.exists || (file.lastModified < lastModified)) {
             log.info(s"writing ${file.getAbsolutePath}")

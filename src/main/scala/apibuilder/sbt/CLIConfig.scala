@@ -1,7 +1,7 @@
 package apibuilder.sbt
 
 import java.io.File
-import java.nio.file.PathMatcher
+import java.nio.file.{Path, PathMatcher}
 
 import io.circe.Decoder
 import io.circe.yaml.parser
@@ -12,7 +12,7 @@ import scala.util.Try
 final case class CLIConfig(organizationFor: Map[String, OrganizationConfig])        extends AnyVal
 final case class OrganizationConfig(applicationFor: Map[String, ApplicationConfig]) extends AnyVal
 final case class ApplicationConfig(version: String, generators: Seq[GeneratorConfig])
-final case class GeneratorConfig(generator: String, pathMatchers: Seq[PathMatcher])
+final case class GeneratorConfig(generator: String, target: Option[Path], pathMatchers: Seq[PathMatcher])
 
 object CLIConfig extends BaseDecoders {
   final def load(f: File): Either[Throwable, CLIConfig] =
@@ -37,7 +37,8 @@ object CLIConfig extends BaseDecoders {
   implicit final val generatorConfigDecoder: Decoder[GeneratorConfig] = Decoder.instance { c =>
     for {
       generator    <- c.downField("generator").as[String]
+      target       <- c.downField("target").as[Option[Path]]
       pathMatchers <- c.downField("files").as[Seq[PathMatcher]]
-    } yield GeneratorConfig(generator, pathMatchers)
+    } yield GeneratorConfig(generator, target, pathMatchers)
   }
 }
