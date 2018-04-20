@@ -2,7 +2,7 @@ package apibuilder.sbt
 
 import java.nio.file.{Path, PathMatcher}
 
-final case class ApiBuilderRequest(target: Option[Path], path: String, matchers: Seq[PathMatcher])
+final case class ApiBuilderRequest(path: String, matchers: Seq[PathMatcher], target: Option[Path])
 
 object ApiBuilderRequests {
   def fromCLIConfig(cliConfig: CLIConfig): Seq[ApiBuilderRequest] =
@@ -10,5 +10,5 @@ object ApiBuilderRequests {
       (org, orgConfig)                              <- cliConfig.organizationFor.toList
       (app, ApplicationConfig(version, generators)) <- orgConfig.applicationFor
       GeneratorConfig(generator, target, pathMatchers)      <- generators
-    } yield ApiBuilderRequest(target, s"$org/$app/$version/$generator", pathMatchers)
+    } yield ApiBuilderRequest(s"$org/$app/$version/$generator", pathMatchers, target)
 }

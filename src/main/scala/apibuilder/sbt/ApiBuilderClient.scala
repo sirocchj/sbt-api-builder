@@ -13,7 +13,7 @@ final class ApiBuilderClient(log: Logger, baseURL: URL, basicAuth: String) {
     Gigahorse.withHttp(Gigahorse.config) { client =>
       Future
         .traverse(apiBuilderRequests) {
-          case ApiBuilderRequest(target, path, matchers) =>
+          case ApiBuilderRequest(path, matchers, target) =>
             val Valid = new CodeValidator(log, matchers)
             client
               .run {
