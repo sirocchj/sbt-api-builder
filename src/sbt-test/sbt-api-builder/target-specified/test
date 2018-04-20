@@ -1,0 +1,7 @@
+> compile
+$ exists src/main/scala/common/io/apibuilder/common/v0/ApicollectiveApibuilderCommonV0JsonOnly.scala
+$ exists src/main/scala/common/io/apibuilder/common/v0/ApicollectiveApibuilderCommonV0ModelsOnly.scala
+$ exists src/main/scala/internal/io/apibuilder/internal/v0/ApicollectiveApibuilderInternalV0Models.scala
+> test
+$ exists src/main/scala/common/io/apibuilder/common/v0/ApicollectiveApibuilderCommonV0MockClient.scala
+> run
