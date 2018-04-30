@@ -67,7 +67,6 @@ object ApiBuilderPlugin extends AutoPlugin {
       val profile            = apiBuilderProfile.value.getOrElse(Properties.envOrElse("APIBUILDER_PROFILE", "default" ))
       val url                = apiBuilderUrl.value
       val localCLIConfigFile = apiBuilderCLIConfigDirectory.value / apiBuilderCLIConfigFilename.value
-      val basePath           = sourceManaged.value.toPath
 
       val token: Option[String] = Properties.envOrNone("APIBUILDER_TOKEN")
         .orElse {
@@ -91,8 +90,9 @@ object ApiBuilderPlugin extends AutoPlugin {
       }
 
       Await.result(eventualResponses, 1.minute).map {
-        case ApiBuilderResponse(lastModified, filePath, contents) =>
-          val file = basePath.resolve(filePath).normalize.toFile
+        case ApiBuilderResponse(lastModified, target, filePath, contents) =>
+          val file = target.fold(sourceManaged.value.toPath)(baseDirectory.value.toPath.resolve).resolve(filePath).normalize.toFile
+
           if (!file.exists || (file.lastModified < lastModified)) {
             log.info(s"writing ${file.getAbsolutePath}")
             IO.write(file, contents)
