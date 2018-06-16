@@ -23,7 +23,8 @@ object ApiBuilderPlugin extends AutoPlugin {
     val apiBuilderUrl     = settingKey[URL]("The Api Builder URL to use (default: https://api.apibuilder.io)")
 
     val apiBuilderCLIConfigDirectory =
-      settingKey[File]("The directory where to find the ApiBuilder CLI YAML config file (default src/[main|test]/apibuilder)")
+      settingKey[File](
+        "The directory where to find the ApiBuilder CLI YAML config file (default src/[main|test]/apibuilder)")
     val apiBuilderCLIConfigFilename =
       settingKey[String]("The name of the ApiBuilder CLI YAML config file (default: config)")
 
@@ -40,8 +41,7 @@ object ApiBuilderPlugin extends AutoPlugin {
     apiBuilderUrl := url("https://api.apibuilder.io")
   )
 
-  override def projectSettings: Seq[Def.Setting[_]] =
-    inConfig(Compile)(rawSettings) ++ inConfig(Test)(rawSettings)
+  override def projectSettings: Seq[Def.Setting[_]] = inConfig(Compile)(rawSettings) ++ inConfig(Test)(rawSettings)
 
   private def rawSettings: Seq[Setting[_]] = Seq(
     apiBuilderCLIConfigDirectory := sourceDirectory.value / "apibuilder",
@@ -50,7 +50,7 @@ object ApiBuilderPlugin extends AutoPlugin {
     sourceGenerators += apiBuilderUpdate
   )
 
-  def generate = Def.taskDyn {
+  def generate: Def.Initialize[Task[Seq[File]]] = Def.taskDyn {
     val log = streams.value.log
 
     Def.task {
@@ -64,34 +64,40 @@ object ApiBuilderPlugin extends AutoPlugin {
       def basicAuth(token: String): String = s"Basic ${B64.encodeToString(s"$token:".getBytes(UTF_8))}"
 
       val globalConfigFile   = apiBuilderGlobalConfigDirectory.value / apiBuilderGlobalConfigFilename.value
-      val profile            = apiBuilderProfile.value.getOrElse(Properties.envOrElse("APIBUILDER_PROFILE", "default" ))
+      val profile            = apiBuilderProfile.value.getOrElse(Properties.envOrElse("APIBUILDER_PROFILE", "default"))
       val url                = apiBuilderUrl.value
       val localCLIConfigFile = apiBuilderCLIConfigDirectory.value / apiBuilderCLIConfigFilename.value
 
-      val token: Option[String] = Properties.envOrNone("APIBUILDER_TOKEN")
+      val token: Option[String] = Properties
+        .envOrNone("APIBUILDER_TOKEN")
         .orElse {
-          logFileContents(globalConfigFile)(GlobalConfig.load)
-            .toOption
+          logFileContents(globalConfigFile)(GlobalConfig.load).toOption
             .flatMap(_.profiles.get(profile))
             .map(_.token)
         }
 
       val clientOrError = token match {
-        case None        => Left(new RuntimeException(s"missing token"))
-        case Some(token) => Right(new ApiBuilderClient(log, url, basicAuth(token)))
+        case None    => Left(new RuntimeException("missing token"))
+        case Some(t) => Right(new ApiBuilderClient(log, url, basicAuth(t)))
       }
 
       val requestsOrError = logFileContents(localCLIConfigFile)(CLIConfig.load).map(ApiBuilderRequests.fromCLIConfig)
 
       val eventualResponses = (clientOrError, requestsOrError) match {
-        case (Right(c), Right(r)) => c.retrieveAll(r)
-        case (Left(e1), _)        => Future.failed(e1)
-        case (_, Left(e2))        => log.debug(e2.getLocalizedMessage); Future.successful(Seq.empty)
+        case (Right(c), Right(r))                   => c.retrieveAll(r)
+        case (Left(e), _)                           => Future.failed(e)
+        case (_, Left(mpd: MissingParentDirectory)) => log.debug(mpd.getLocalizedMessage); Future.successful(Seq.empty)
+        case (_, Left(mf: MissingFile))             => log.warn(mf.getLocalizedMessage); Future.successful(Seq.empty)
+        case (_, Left(ic: InvalidContent))          => Future.failed(ic)
       }
 
       Await.result(eventualResponses, 1.minute).map {
-        case ApiBuilderResponse(lastModified, target, filePath, contents) =>
-          val file = target.fold(sourceManaged.value.toPath)(baseDirectory.value.toPath.resolve).resolve(filePath).normalize.toFile
+        case ApiBuilderResponse(lastModified, maybeTargetPath, filePath, contents) =>
+          val file = maybeTargetPath
+            .fold(sourceManaged.value.toPath)(baseDirectory.value.toPath.resolve)
+            .resolve(filePath)
+            .normalize
+            .toFile
 
           if (!file.exists || (file.lastModified < lastModified)) {
             log.info(s"writing ${file.getAbsolutePath}")

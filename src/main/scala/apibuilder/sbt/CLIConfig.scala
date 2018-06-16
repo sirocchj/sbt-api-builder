@@ -1,26 +1,33 @@
 package apibuilder.sbt
 
-import java.io.File
+import java.io.{File, FileNotFoundException}
 import java.nio.file.{Path, PathMatcher}
 
 import io.circe.Decoder
 import io.circe.yaml.parser
 import sbt.IO
 
-import scala.util.Try
-
 final case class CLIConfig(organizationFor: Map[String, OrganizationConfig])        extends AnyVal
 final case class OrganizationConfig(applicationFor: Map[String, ApplicationConfig]) extends AnyVal
 final case class ApplicationConfig(version: String, generators: Seq[GeneratorConfig])
-final case class GeneratorConfig(generator: String, target: Option[Path], pathMatchers: Seq[PathMatcher])
+final case class GeneratorConfig(generator: String, maybeTargetPath: Option[Path], pathMatchers: Seq[PathMatcher])
 
 object CLIConfig extends BaseDecoders {
-  final def load(f: File): Either[Throwable, CLIConfig] =
-    Try {
-      IO.reader(f) { r =>
-        parser.parse(r).flatMap(_.as[CLIConfig])
+  final def load(f: File): Either[ConfigException, CLIConfig] =
+    if (!f.getParentFile.exists) Left(MissingParentDirectory(f))
+    else {
+      try {
+        IO.reader(f) { r =>
+          parser
+            .parse(r)
+            .left
+            .map(pf => InvalidContent(pf.message))
+            .flatMap(_.as[CLIConfig].left.map(df => InvalidContent(df.message)))
+        }
+      } catch {
+        case _: FileNotFoundException => Left(MissingFile(f))
       }
-    }.toEither.joinRight
+    }
 
   implicit final val cliConfigDecoder: Decoder[CLIConfig] = Decoder.instance { c =>
     c.downField("code").as[Map[String, OrganizationConfig]].map(CLIConfig.apply)
@@ -36,9 +43,9 @@ object CLIConfig extends BaseDecoders {
   }
   implicit final val generatorConfigDecoder: Decoder[GeneratorConfig] = Decoder.instance { c =>
     for {
-      generator    <- c.downField("generator").as[String]
-      target       <- c.downField("target").as[Option[Path]]
-      pathMatchers <- c.downField("files").as[Seq[PathMatcher]]
-    } yield GeneratorConfig(generator, target, pathMatchers)
+      generator       <- c.downField("generator").as[String]
+      maybeTargetPath <- c.downField("target").as[Option[Path]]
+      pathMatchers    <- c.downField("files").as[Seq[PathMatcher]]
+    } yield GeneratorConfig(generator, maybeTargetPath, pathMatchers)
   }
 }

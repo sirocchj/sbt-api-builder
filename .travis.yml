@@ -1,7 +1,7 @@
 sudo: false
 language: scala
 scala:
-- 2.12.4
+- 2.12.6
 script:
 - sbt -Dfile.encoding=UTF8 test scripted
 jdk:

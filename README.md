@@ -1,4 +1,5 @@
-[![Download](https://api.bintray.com/packages/sirocchj/sbt-plugins/sbt-api-builder/images/download.svg) ](https://bintray.com/sirocchj/sbt-plugins/sbt-api-builder/_latestVersion) [![Build Status](https://travis-ci.org/sirocchj/sbt-api-builder.svg?branch=master)](https://travis-ci.org/sirocchj/sbt-api-builder)
+[![Download](https://api.bintray.com/packages/sirocchj/sbt-plugins/sbt-api-builder/images/download.svg)](https://bintray.com/sirocchj/sbt-plugins/sbt-api-builder/_latestVersion)
+[![Build Status](https://travis-ci.org/sirocchj/sbt-api-builder.svg?branch=master)](https://travis-ci.org/sirocchj/sbt-api-builder)
 
 # ApiBuilder SBT Plugin
 
@@ -11,7 +12,7 @@ This plugin requires sbt 1.0.0+
 
 Add the following line to your `./project/plugins.sbt` file:
 ```sbtshell
-addSbtPlugin("com.sirocchj" % "sbt-api-builder" % "0.1.8")
+addSbtPlugin("com.sirocchj" % "sbt-api-builder" % latestVersion)
 ```
 
 That's it! This plugin is automatically installed into every module your project
