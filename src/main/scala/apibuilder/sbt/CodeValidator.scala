@@ -3,7 +3,7 @@ package apibuilder.sbt
 import java.nio.file.PathMatcher
 
 import gigahorse.FullResponse
-import io.circe.jawn
+import io.circe.parser
 import sbt.util.Logger
 
 final class CodeValidator(log: Logger, matchers: Seq[PathMatcher]) {
@@ -11,7 +11,7 @@ final class CodeValidator(log: Logger, matchers: Seq[PathMatcher]) {
     if (response.status != 200)
       throw new RuntimeException(s"expecting 200 got ${response.status}")
     else {
-      jawn.decode[Code](response.bodyAsString) match {
+      parser.decode[Code](response.bodyAsString) match {
         case Left(error) =>
           log.err(s"failed to decode ${response.bodyAsString}")
           throw error
