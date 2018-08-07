@@ -1,0 +1,15 @@
+code:
+  apicollective:
+    apibuilder-common:
+      version: latest
+      generators:
+        - generator: http4s_0_18
+          files:
+            - '*ModelsOnly*'
+            - '*JsonOnly*'
+    apibuilder-internal:
+      version: latest
+      generators:
+        - generator: scala_models
+          files:
+            - '*'

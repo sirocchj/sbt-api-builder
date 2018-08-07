@@ -3,7 +3,6 @@ lazy val `sbt-api-builder` = project
   .settings(
     organization := "com.sirocchj",
     name := "sbt-api-builder",
-    sbtPlugin := true,
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-java8"  % "0.8.0",
       "io.circe" %% "circe-parser" % "0.8.0",
@@ -30,6 +29,6 @@ lazy val `sbt-api-builder` = project
     pgpSecretRing := file(".travis/local.secring.asc"),
     releaseEarlyWith := BintrayPublisher,
     releaseEarlyEnableSyncToMaven := false,
-    scriptedBufferLog := false,
     scriptedLaunchOpts ++= Seq("-Xmx1024M", s"-Dplugin.version=${version.value}")
   )
+  .enablePlugins(SbtPlugin)
