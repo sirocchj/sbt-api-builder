@@ -60,7 +60,7 @@ that is, the profile name is either `default` or it comes after the keyword
 The location where to expect this file defaults to `~/.apibuilder` but it
 can be changed via:
 ```sbtshell
-> set Global/apiBuilderGlobalConfigDirectory := "/foo/bar/somedir"
+> set Global/apiBuilderGlobalConfigDirectory := file("/foo/bar/somedir")
 ```
 Likewise, the name of the file defaults to `config` but it can be changed via:
 ```sbtshell
@@ -79,7 +79,7 @@ Finally, the ApiBuilder files are expected to be found hitting the endpoint
 `https://api.apibuilder.io`. If that is not the case (e.g. you host an internal
 repository), just set the plugin to fetch from a different endpoint:
 ```sbtshell
-> set Global/apiBuilderUrl := "https://acme.org"
+> set Global/apiBuilderUrl := url("https://acme.org")
 ```
 
 ### Model/API configuration
@@ -119,13 +119,20 @@ code:
 ```
 
 As with the global configuration, the directory and the filename of where this
-local configuration YAML file is to be found can be changed via:
+local configuration YAML file is to be found can be changed too.
+Since these settings are scoped at _Compile_ and _Test_ configurations
+(see [sbt documentation](https://www.scala-sbt.org/1.0/docs/Scopes.html#Scoping+by+the+configuration+axis)),
+in order to override the predefined values to `project_root_dir/.apibuilder/config`
+and `project_root_dir/.apibuilder/test_config` (for tests), all it's needed is
+the following:
 ```sbtshell
-> set apiBuilderCLIConfigDirectory := "somelocaldir"
+> set Compile/apiBuilderCLIConfigDirectory := baseDirectory.value / ".apibuilder"
+> set Test/apiBuilderCLIConfigDirectory    := baseDirectory.value / ".apibuilder"
 ```
 and
 ```sbtshell
-> set apiBuilderCLIConfigFilename := "my_yaml_config"
+> set Compile/apiBuilderCLIConfigFilename := "config" // really unchanged, no need to override
+> set Test/apiBuilderCLIConfigFilename    := "test_config"
 ```
 
 ## License
