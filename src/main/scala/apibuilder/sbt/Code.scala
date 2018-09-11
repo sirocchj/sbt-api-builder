@@ -6,7 +6,7 @@ import java.time.Instant
 import io.circe.Decoder
 
 final case class Code(updatedAt: Instant, files: Seq[CodeFile])
-final case class CodeFile(name: Path, dir: Path, contents: String)
+final case class CodeFile(name: Path, maybeDir: Option[Path], contents: String)
 
 object Code extends BaseDecoders {
   implicit final val codeDecoder: Decoder[Code] = Decoder.instance { c =>
@@ -18,8 +18,8 @@ object Code extends BaseDecoders {
   implicit final val codeFileDecoder: Decoder[CodeFile] = Decoder.instance { c =>
     for {
       name     <- c.downField("name").as[Path]
-      dir      <- c.downField("dir").as[Path]
+      maybeDir <- c.downField("dir").as[Option[Path]]
       contents <- c.downField("contents").as[String]
-    } yield CodeFile(name, dir, contents)
+    } yield CodeFile(name, maybeDir, contents)
   }
 }
