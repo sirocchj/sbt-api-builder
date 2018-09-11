@@ -1,0 +1,13 @@
+code:
+  apicollective:
+    apibuilder-generator:
+      version: latest
+      generators:
+        - generator: play_2_x_json
+          files:
+            - '*Models*'
+          target: app
+        - generator: play_2_x_routes
+          files:
+            - '*routes*'
+          target: conf

@@ -91,7 +91,7 @@ object ApiBuilderPlugin extends AutoPlugin {
         case (_, Left(ic: InvalidContent))          => Future.failed(ic)
       }
 
-      Await.result(eventualResponses, 1.minute).map {
+      Await.result(eventualResponses, 1.minute).flatMap {
         case ApiBuilderResponse(lastModified, maybeTargetPath, filePath, contents) =>
           val file = maybeTargetPath
             .fold(sourceManaged.value.toPath)(baseDirectory.value.toPath.resolve)
@@ -106,7 +106,10 @@ object ApiBuilderPlugin extends AutoPlugin {
           } else {
             log.info(s"skipping ${file.getAbsolutePath}, newer file on filesystem")
           }
-          file
+          file.ext match {
+            case "scala" | "java" => Some(file)
+            case _                => None
+          }
       }
     }
   }

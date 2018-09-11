@@ -23,7 +23,9 @@ final class ApiBuilderClient(log: Logger, baseURL: URL, basicAuth: String) {
               }
               .collect {
                 case Valid(lastModified, codeFiles) =>
-                  codeFiles.map(cf => ApiBuilderResponse(lastModified, target, cf.dir.resolve(cf.name), cf.contents))
+                  codeFiles.map { cf =>
+                    ApiBuilderResponse(lastModified, target, cf.maybeDir.fold(cf.name)(_.resolve(cf.name)), cf.contents)
+                  }
               }
         }
         .map(_.flatten)

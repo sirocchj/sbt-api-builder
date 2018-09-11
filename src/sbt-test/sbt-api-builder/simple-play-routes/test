@@ -1,0 +1,3 @@
+> apiBuilderUpdate
+$ exists app/io/apibuilder/generator/v0/ApicollectiveApibuilderGeneratorV0Models.scala
+$ exists conf/routes
