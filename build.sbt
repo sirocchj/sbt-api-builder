@@ -5,7 +5,7 @@ lazy val `sbt-api-builder` = project
     name := "sbt-api-builder",
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-java8"  % "0.8.0",
-      "io.circe" %% "circe-parser" % "0.8.0",
+      "io.circe" %% "circe-parser" % "0.11.0",
       "io.circe" %% "circe-yaml"   % "0.6.1"
     ),
     licenses += "MIT" -> url("http://opensource.org/licenses/MIT"),
