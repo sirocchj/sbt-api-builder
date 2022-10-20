@@ -1,12 +1,12 @@
 package apibuilder.sbt
 
+import sbt.*
+import sbt.Keys.*
+
 import java.nio.charset.StandardCharsets.UTF_8
-import java.util.Base64.{getEncoder => B64}
-
-import sbt.Keys._
-import sbt.{Def, _}
-
-import scala.concurrent.duration._
+import java.time.Instant
+import java.util.Base64
+import scala.concurrent.duration.*
 import scala.concurrent.{Await, Future}
 import scala.util.Properties
 
@@ -23,8 +23,7 @@ object ApiBuilderPlugin extends AutoPlugin {
     val apiBuilderUrl     = settingKey[URL]("The Api Builder URL to use (default: https://api.apibuilder.io)")
 
     val apiBuilderCLIConfigDirectory =
-      settingKey[File](
-        "The directory where to find the ApiBuilder CLI YAML config file (default src/[main|test]/apibuilder)")
+      settingKey[File]("The directory where to find the ApiBuilder CLI YAML config file (default src/[main|test]/apibuilder)")
     val apiBuilderCLIConfigFilename =
       settingKey[String]("The name of the ApiBuilder CLI YAML config file (default: config)")
 
@@ -32,21 +31,21 @@ object ApiBuilderPlugin extends AutoPlugin {
       taskKey[Seq[File]]("Updates the classes generated from the model/api by fetching them remotely")
   }
 
-  import autoImport._
+  import autoImport.*
 
-  override def globalSettings: Seq[Def.Setting[_]] = Seq(
+  override def globalSettings: Seq[Def.Setting[?]] = Seq(
     apiBuilderGlobalConfigDirectory := Path.userHome / ".apibuilder",
-    apiBuilderGlobalConfigFilename := "config",
-    apiBuilderProfile := None,
-    apiBuilderUrl := url("https://api.apibuilder.io")
+    apiBuilderGlobalConfigFilename  := "config",
+    apiBuilderProfile               := None,
+    apiBuilderUrl                   := url("https://api.apibuilder.io")
   )
 
-  override def projectSettings: Seq[Def.Setting[_]] = inConfig(Compile)(rawSettings) ++ inConfig(Test)(rawSettings)
+  override def projectSettings: Seq[Def.Setting[?]] = inConfig(Compile)(rawSettings) ++ inConfig(Test)(rawSettings)
 
-  private def rawSettings: Seq[Setting[_]] = Seq(
+  private def rawSettings: Seq[Setting[?]] = Seq(
     apiBuilderCLIConfigDirectory := sourceDirectory.value / "apibuilder",
-    apiBuilderCLIConfigFilename := "config",
-    apiBuilderUpdate := generate.value,
+    apiBuilderCLIConfigFilename  := "config",
+    apiBuilderUpdate             := generate.value,
     sourceGenerators += apiBuilderUpdate
   )
 
@@ -61,7 +60,7 @@ object ApiBuilderPlugin extends AutoPlugin {
         a
       }
 
-      def basicAuth(token: String): String = s"Basic ${B64.encodeToString(s"$token:".getBytes(UTF_8))}"
+      def basicAuth(token: String): String = s"Basic ${Base64.getEncoder.encodeToString(s"$token:".getBytes(UTF_8))}"
 
       val globalConfigFile   = apiBuilderGlobalConfigDirectory.value / apiBuilderGlobalConfigFilename.value
       val profile            = apiBuilderProfile.value.getOrElse(Properties.envOrElse("APIBUILDER_PROFILE", "default"))
@@ -91,25 +90,36 @@ object ApiBuilderPlugin extends AutoPlugin {
         case (_, Left(ic: InvalidContent))          => Future.failed(ic)
       }
 
-      Await.result(eventualResponses, 1.minute).flatMap {
-        case ApiBuilderResponse(lastModified, maybeTargetPath, filePath, contents) =>
-          val file = maybeTargetPath
-            .fold(sourceManaged.value.toPath)(baseDirectory.value.toPath.resolve)
-            .resolve(filePath)
-            .normalize
-            .toFile
+      Await.result(eventualResponses, 1.minute).flatMap { case ApiBuilderResponse(lastModified, maybeTargetPath, filePath, contents) =>
+        val file = maybeTargetPath
+          .fold(sourceManaged.value.toPath)(baseDirectory.value.toPath.resolve)
+          .resolve(filePath)
+          .normalize
+          .toFile
 
-          if (!file.exists || (file.lastModified < lastModified)) {
-            log.info(s"writing ${file.getAbsolutePath}")
-            IO.write(file, contents)
-            file.setLastModified(lastModified)
+        def writeFile(): Unit = {
+          IO.write(file, contents)
+          file.setLastModified(lastModified)
+        }
+
+        if (!file.exists()) {
+          log.info(s"APIBuilder: File ${file.getAbsolutePath} does not exist, creating.")
+          writeFile()
+        } else {
+          val fileLastMod = Instant.ofEpochMilli(file.lastModified())
+          val apiLastMod  = Instant.ofEpochMilli(lastModified)
+          if (file.lastModified < lastModified) {
+            log.info(s"APIBuilder: ${file.getAbsolutePath} older ($fileLastMod) than APIBuilder's ($apiLastMod), overwriting.")
+            writeFile()
           } else {
-            log.info(s"skipping ${file.getAbsolutePath}, newer file on filesystem")
+            log.info(s"APIBuilder:${file.getAbsolutePath} newer ($fileLastMod than APIBuilder's ($apiLastMod), skipping.")
           }
-          file.ext match {
-            case "scala" | "java" => Some(file)
-            case _                => None
-          }
+        }
+
+        file.ext match {
+          case "scala" | "java" => Some(file)
+          case _                => None
+        }
       }
     }
   }

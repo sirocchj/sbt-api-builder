@@ -1,7 +1,8 @@
 .idea
-
 local.*
-
 target
 project/project
 project/target
+.bsp/
+.bloop/
+.metals/

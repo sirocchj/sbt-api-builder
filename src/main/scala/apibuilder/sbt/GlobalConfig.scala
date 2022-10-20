@@ -24,11 +24,10 @@ object GlobalConfig {
       IO.reader(f) { r =>
         GlobalConfig(
           IO.foldLines(r, List.empty[(String, Option[Profile])]) {
-              case (acc, ProfileM(_, pn)) if acc.hasNotSeen(pn) => (pn -> None) :: acc
-              case ((cpn, None) :: rest, TokenM(t))             => (cpn -> Some(Profile(t))) :: rest
-              case (acc, _)                                     => acc
-            }
-            .collect { case (profile, Some(config)) => profile -> config }
+            case (acc, ProfileM(_, pn)) if acc.hasNotSeen(pn) => (pn  -> None) :: acc
+            case ((cpn, None) :: rest, TokenM(t))             => (cpn -> Some(Profile(t))) :: rest
+            case (acc, _)                                     => acc
+          }.collect { case (profile, Some(config)) => profile -> config }
             .toMap
         )
       }

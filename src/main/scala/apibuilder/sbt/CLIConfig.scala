@@ -16,7 +16,7 @@ object CLIConfig extends BaseDecoders {
   final def load(f: File): Either[ConfigException, CLIConfig] =
     if (!f.getParentFile.exists) Left(MissingParentDirectory(f))
     else {
-      try {
+      try
         IO.reader(f) { r =>
           parser
             .parse(r)
@@ -24,7 +24,7 @@ object CLIConfig extends BaseDecoders {
             .map(pf => InvalidContent(pf.message))
             .flatMap(_.as[CLIConfig].left.map(df => InvalidContent(df.message)))
         }
-      } catch {
+      catch {
         case _: FileNotFoundException => Left(MissingFile(f))
       }
     }
