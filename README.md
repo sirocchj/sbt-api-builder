@@ -1,3 +1,10 @@
+# Oct 20, 2022 - This project has [moved](https://github.com/laserdisc-io/sbt-api-builder)!
+
+> **Warning**
+> This project has relocated to [laserdisc-io/sbt-api-builder](https://github.com/laserdisc-io/sbt-api-builder), with the artifacts now published under `io.laserdisc` instead of `com.sirocchj`.  Please update your references to the new repository, as **this repo is no longer maintained**. 
+
+<br/><br/>
+
 [![Download](https://api.bintray.com/packages/sirocchj/sbt-plugins/sbt-api-builder/images/download.svg)](https://bintray.com/sirocchj/sbt-plugins/sbt-api-builder/_latestVersion)
 [![Build Status](https://travis-ci.org/sirocchj/sbt-api-builder.svg?branch=master)](https://travis-ci.org/sirocchj/sbt-api-builder)
 
